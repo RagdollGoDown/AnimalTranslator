@@ -21,10 +21,13 @@ Press Ctrl-C on the command line to stop the bot.
 """
 
 import logging
-
+import os
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from keys import TELEGRAM_KEY
+from keys import HUGGING_FACE_KEY
+import requests
+import base64
 
 # Enable logging
 logging.basicConfig(
@@ -35,6 +38,14 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
+os.makedirs("downloads", exist_ok=True)
+
+API_URL = "https://router.huggingface.co/nebius/v1/chat/completions"
+headers = {
+    "Authorization": f"Bearer {HUGGING_FACE_KEY}",
+}
+
+last_image_id = ""
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
@@ -52,9 +63,75 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text("Help!")
 
 
+def query(payload):
+    response = requests.post(API_URL, headers=headers, json=payload)
+    return response.json()
+
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
-    await update.message.reply_text(update.message.text)
+    msg = update.message
+
+    if msg.photo:
+        photo: telegram.PhotoSize = msg.photo[-1]
+        if msg.caption:
+            await msg.reply_text(f"Vous avez envoyé une photo avec la légende : « {msg.caption} »")
+
+            file = await photo.get_file()  
+
+            filename = f"downloads/{photo.file_unique_id}.jpg"
+
+            await file.download_to_drive(custom_path=filename)
+            image_path = filename
+            with open(image_path, "rb") as f:
+                base64_image = base64.b64encode(f.read()).decode("utf-8")
+            image_url = f"data:image/jpeg;base64,{base64_image}"
+            response = query({
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": msg.caption
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": image_url},
+                            }
+                        ]
+                    }
+                ],
+                "model": "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
+            })
+            
+            await msg.reply_text(response["choices"][0]["message"]["content"])
+        else:
+            await msg.reply_text("Vous avez envoyé une photo sans légende.")
+        
+        last_image_id = photo.file_unique_id
+        
+
+
+    elif msg.text:
+        await msg.reply_text(f"Vous avez envoyé un texte : « {msg.text} »")
+
+    elif msg.audio or msg.voice:
+        audio = None
+        if msg.audio:
+            audio = msg.audio
+        else:
+            audio = msg.voice
+        
+        audio_file = await msg.get_file()
+        tmp_file = f"downloads/{audio.file_unique_id}.wav"
+        await audio_file.download_to_drive(tmp_file)
+        await msg.reply_text(f"Vous avez envoyé un audio ")
+
+    else:
+        await msg.reply_text("Type de message non géré par echo.")
+
+
+    #await update.message.reply_text(update.message.text)
 
 
 def main() -> None:
@@ -67,7 +144,7 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
 
     # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(MessageHandler(~filters.COMMAND, echo))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
