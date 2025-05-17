@@ -19,16 +19,29 @@ def pipeline(image, audio) -> str:
 
     # image -> classify
     caption = query_image(image, "What is the animal in the image?")
+    print("Animal found:", caption)
 
     # audio -> transcribe
     result = speech_recognition(audio)
+    print("Animal speech detected:", result)
 
     # information aggregation
-    final_text_question = f"Animal found: {caption} \n Animal feeling: {result}"
+    final_text_question = f"""
+    We have these informations :\n
+    Animal found: {caption} \n Animal speach detected: {result} \n
+    You are translating what the animal is saying. This information might not suffice 
+    so you will need to use your imagination. It does not need to be true.
+
+    Also assume the classification is true, but the translation is just human speechrecognition applied to an animal.
+    so it should just serve as a hint to what the animal is saying. Do not mention it in your answer.
+    Be confident in you're answer and give a single answer. Keep it short and simple.
+    \n
+
+    """
     
     final_text = mistral.ask_mistral(final_text_question)
 
-    return final_text
+    return final_text['choices'][0]['message']['content']
 
 
 def main():
