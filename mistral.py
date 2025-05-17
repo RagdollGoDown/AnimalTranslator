@@ -33,27 +33,29 @@ def ask_mistral(question):
 
 def image_and_text_to_text(image_path, questions):
     # Define the messages for the chat
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "text",
-                    "text": questions
-                },
-                {
-                    "type": "image_url",
-                    "image_url": image_path
-                }
-            ]
-        }
-    ]
+    response = []
+    for question in questions:
 
-    # Get the chat response
-    chat_response = client.chat.complete(
-        model=model,
-        messages=messages
-    )
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": question
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": image_path
+                    }
+                ]
+            }
+        ]
 
-    # Print the content of the response
-    return chat_response.choices[0].message.content
+        # Get the chat response
+        chat_response = client.chat.complete(
+            model=model,
+            messages=messages
+        )
+        response.append(chat_response.choices[0].message.content)
+    return response
