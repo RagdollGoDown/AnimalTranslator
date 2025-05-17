@@ -14,14 +14,15 @@ import os
 from mistralai import Mistral
 
 api_key = MISTRAL_API_KEY
-model = "mistral-large-latest"
+model1 = "mistral-large-latest"
+model2 = "pixtral-12b-2409" 
 
 client = Mistral(api_key=api_key)
 
 
 def ask_mistral(question):
     chat_response = client.chat.complete(
-        model = model,
+        model = model1,
         messages = [
             {
                 "role": "user",
@@ -57,7 +58,7 @@ def image_and_text_to_text(image_path, questions):
 
         # Get the chat response
         chat_response = client.chat.complete(
-            model=model,
+            model=model2,
             messages=messages
         )
         response.append(chat_response.choices[0].message.content)
