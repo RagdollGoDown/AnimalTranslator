@@ -69,7 +69,13 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text("Help!")
 
 async def yes_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    global last_command
+    global last_image_id
+    global last_audio_id
+
+    global last_msg_type
     last_command = "yes"
+    
     
 
 async def no_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -91,6 +97,10 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     msg = update.message
     global last_command
+    global last_image_id
+    global last_audio_id
+
+    global last_msg_type
     if msg.photo:
         photo: telegram.PhotoSize = msg.photo[-1]
         '''if msg.caption:
