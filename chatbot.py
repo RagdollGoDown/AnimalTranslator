@@ -125,14 +125,14 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
                 await file.download_to_drive(custom_path=filename)
                 image_path = filename
-                msg.reply_text(f"Do you want to send an audio to analyze ?")
+                await msg.reply_text(f"Do you want to send an audio to analyze ?")
             elif msg.audio or msg.voice:
                 audio = None
                 audio_file = await msg.get_file()
                 tmp_file = f"assets/audio/{audio.file_unique_id}.wav"
                 await audio_file.download_to_drive(tmp_file)
                 last_audio_id = audio.file_unique_id
-                msg.reply_text(f"Do you want to send a picture to analyze ?")
+                await msg.reply_text(f"Do you want to send a picture to analyze ?")
         elif last_command == "yes":
             photo: telegram.PhotoSize = msg.photo[-1]
             # call full pipeline
