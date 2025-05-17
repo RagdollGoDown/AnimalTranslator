@@ -55,13 +55,14 @@ def pipeline_full(image_path, audio) -> str:
     The information retrieved from the sound is:\n
     {result}
 
-    You are analyzing an animal in an image and a sound. We are going to give information retrieved from both.
-    The informat from the image is a reliable and can appear in your answer, but the information from the sound is not reliable.
-    The speech recognition should only serve as inspiration for your answer and not appear in it.
-    Give a plausible answer with confidence.
-    Keep it short and simple.
+    Imagine yourself as a translator for animals.
+    You have information from the image and the sound. Of course, you can't understand the animal,
+    but you are going to act like a confident translator and give a clear and plausible answer of what the animal is saying.
 
-    Now think of what an animal translator would say:
+    Keep in mind the information from the sound is just speech recognition, not the actual animal speech.
+    So it doesn't actually mean anything and you MUST NOT mention it. 
+
+    Give a short and simple answer, like a translator would do and cooborate it with the information from the image:
     \n
     """
     
@@ -122,7 +123,7 @@ def pipeline_image(image_path) -> str:
 def main():
     # Example usage
     image_path = os.getcwd() + "\\assets\\images\\monkey.png"
-    audio_path = os.getcwd() + "\\assets\\audio\\ylan_barking.wav"
+    audio_path = os.getcwd() + "\\assets\\audio\\monkey_noises.wav"
 
     # Load the image
     #image = Image.open(image_path)
