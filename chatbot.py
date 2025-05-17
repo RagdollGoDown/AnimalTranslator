@@ -86,7 +86,7 @@ async def no_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     global last_msg_type
     if last_msg_type == "photo":
         image_pth = f"assets/images/{last_image_id}.wav"
-        await update.message.reply_text(pipeline.query_image(image_pth))
+        await update.message.reply_text(pipeline.pipeline_image(image_pth))
     if last_msg_type == "audio":
         audio_pth = f"assets/audio/{last_audio_id}.wav"
         await update.message.reply_text(pipeline.pipeline_audio(audio_pth))
