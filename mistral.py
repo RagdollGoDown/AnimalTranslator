@@ -91,29 +91,35 @@ def ask_mistral(question):
     return response
 
 
-def image_and_text_to_text(image_path, question):
+def image_and_text_to_text(image_path, questions):
     with open(image_path, "rb") as f:
             base64_image = base64.b64encode(f.read()).decode("utf-8")
             image_url = f"data:image/jpeg;base64,{base64_image}"
-            response = query({
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": f"{question}"
-                            },
-                            {
-                                "type": "image_url",
-                                "image_url": {"url": image_url},
-                            }
-                        ]
-                    }
-                ],
-                "model": "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
-            })
-    return response
+            responses = []
+            for question in questions:
+                
+                response = query({
+                    "messages": [
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": f"{question}"
+                                },
+                                {
+                                    "type": "image_url",
+                                    "image_url": {"url": image_url},
+                                }
+                            ]
+                        }
+                    ],
+                    "model": "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
+                })
+                responses.append(response)
+             
+
+    return responses
 
 
 
