@@ -147,9 +147,9 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                     audio_file = await msg.audio.get_file()
                 else :
                     audio_file = await msg.voice.get_file()
-                tmp_file = f"assets/audio/{msg.audio.file_unique_id}.wav"
+                tmp_file = f"assets/audio/{audio_file.file_unique_id}.wav"
                 await audio_file.download_to_drive(tmp_file)
-                last_audio_id = audio.file_unique_id
+                last_audio_id = audio_file.file_unique_id
                 await msg.reply_text(f"Do you want to send a picture to analyze ?")
         elif last_command == "yes":
             photo: telegram.PhotoSize = msg.photo[-1]
