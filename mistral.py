@@ -78,7 +78,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
             file = await photo.get_file()  
 
-            filename = f"assets/images/{photo.file_unique_id}.jpg"
+            filename = f"downloads/{photo.file_unique_id}.jpg"
 
             await file.download_to_drive(custom_path=filename)
             image_path = filename
@@ -123,7 +123,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             audio = msg.voice
         
         audio_file = await msg.get_file()
-        tmp_file = f"assets/audio/{audio.file_unique_id}.wav"
+        tmp_file = f"downloads/{audio.file_unique_id}.wav"
         await audio_file.download_to_drive(tmp_file)
         await msg.reply_text(f"Vous avez envoyé un audio ")
 
