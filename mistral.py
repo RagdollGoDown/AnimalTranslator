@@ -91,6 +91,34 @@ def ask_mistral(question):
     return response
 
 
+def image_and_text_to_text(image_path, question):
+    with open(image_path, "rb") as f:
+            base64_image = base64.b64encode(f.read()).decode("utf-8")
+            image_url = f"data:image/jpeg;base64,{base64_image}"
+            response = query({
+                "messages": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"{question}"
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {"url": image_url},
+                            }
+                        ]
+                    }
+                ],
+                "model": "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
+            })
+    return response
+
+
+
+
+
 
 input_text = "You are translating what the dog is saying : We have these informations :"
 response_main = ask_mistral(input_text)

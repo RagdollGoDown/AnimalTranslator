@@ -28,6 +28,7 @@ from keys import TELEGRAM_KEY
 from keys import HUGGING_FACE_KEY
 import requests
 import base64
+from mistral import image_and_text_to_text
 
 # Enable logging
 logging.basicConfig(
@@ -82,27 +83,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
             await file.download_to_drive(custom_path=filename)
             image_path = filename
-            with open(image_path, "rb") as f:
-                base64_image = base64.b64encode(f.read()).decode("utf-8")
-            image_url = f"data:image/jpeg;base64,{base64_image}"
-            response = query({
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": msg.caption
-                            },
-                            {
-                                "type": "image_url",
-                                "image_url": {"url": image_url},
-                            }
-                        ]
-                    }
-                ],
-                "model": "mistralai/Mistral-Small-3.1-24B-Instruct-2503"
-            })
+            response = image_and_text_to_text(images=image_path, text=msg.caption)
             
             await msg.reply_text(response["choices"][0]["message"]["content"])
         else:
