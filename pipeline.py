@@ -1,25 +1,50 @@
 from test_blip import query_blip
 from test_whisper import query_whisper 
-import mistral
+from mistral import ask_mistral, image_and_text_to_text
 
 import os
 from PIL import Image
 import librosa
 
-def query_image(image, question="How does this dog feel?"):
+def query_image(image_path, **questions):
     # Load and process the image
-    caption = query_blip(image, question)
-    return caption
+    answers = image_and_text_to_text(image_path, questions)
+    return answers
+
+def query_image_blip(image, questions):
+    # Load and process the image
+    answers = []
+
+    for question in questions:
+        answers.append(query_blip(image, question))
+        print(f"Question: {question}\nAnswer: {answers}\n")
+    return answers
+
 
 def speech_recognition(audio):
     result = query_whisper(audio)
     return result
 
-def pipeline(image, audio) -> str:
+def pipeline(image_path, audio) -> str:
+
+    image_questions = [
+        "What is the animal in the image?",
+        "How is the animal feeling?",
+        "What color is this animal?"
+    ]
+
+    image = Image.open(image_path)
+
 
     # image -> classify
-    caption = query_image(image, "What is the animal in the image?")
-    print("Animal found:", caption)
+    answers_image = query_image(image_path, questions=image_questions)
+    #answers_image = query_blip(image,image_questions)
+    
+    image_info_block = ""
+    for question, answer in zip(image_questions, answers_image):
+        image_info_block += f"Question: {question}\nAnswer: {answer}\n\n"
+    print("Image information block:", image_info_block)
+    
 
     # audio -> transcribe
     result = speech_recognition(audio)
@@ -27,21 +52,21 @@ def pipeline(image, audio) -> str:
 
     # information aggregation
     final_text_question = f"""
-    We have these informations :\n
-    Animal found: {caption} \n Animal speach detected: {result} \n
-    You are translating what the animal is saying. This information might not suffice 
-    so you will need to use your imagination. It does not need to be true.
+    The information retrieved from the image is:\n
+    {image_info_block}
+    The information retrieved from the sound is:\n
+    {result}
 
-    Also assume the classification is true, but the translation is just human speechrecognition applied to an animal.
-    so it should just serve as a hint to what the animal is saying. Do not mention it in your answer.
-    Be confident in you're answer and give a single answer. Keep it short and simple.
+    You are analyzing an animal in an image and a sound. We are going to give information retrieved from both.
+    The information retrieved from the sound is a speech recognition result. 
+    Do not mention it and only use it as inspiration for your answer.
+    You do not have to actually tell the truth about the animal, just give a plausible answer with confidence.
     \n
-
     """
     
-    final_text = mistral.ask_mistral(final_text_question)
+    final_text = ask_mistral(final_text_question)
 
-    return final_text['choices'][0]['message']['content']
+    return final_text
 
 
 def main():
@@ -50,12 +75,12 @@ def main():
     audio_path = os.getcwd() + "\\assets\\audio\\ylan_barking.wav"
 
     # Load the image
-    image = Image.open(image_path)
+    #image = Image.open(image_path)
 
     # Load the audio
     audio, sr = librosa.load(audio_path, sr=16000)
 
-    final_text = pipeline(image, audio)
+    final_text = pipeline(image_path, audio)
     print("Final text:", final_text)
 
 if __name__ == "__main__":
