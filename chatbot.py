@@ -79,7 +79,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
             file = await photo.get_file()  
 
-            filename = f"downloads/{photo.file_unique_id}.jpg"
+            filename = f"assets/images/{photo.file_unique_id}.jpg"
 
             await file.download_to_drive(custom_path=filename)
             image_path = filename

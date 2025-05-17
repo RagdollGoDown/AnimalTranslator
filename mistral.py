@@ -120,7 +120,13 @@ def image_and_text_to_text(image_path, question):
 
 
 
-input_text = "You are translating what the dog is saying : We have these informations :"
-response_main = ask_mistral(input_text)
+#input_text = "You are translating what the dog is saying : We have these informations :"
+#response_main = ask_mistral(input_text)
+
+input_text = "What is in this image ?"
+image_path = "assets/images/happy_dog.jpeg"
+response_main = image_and_text_to_text(image_path, input_text)
+
+
 print(response_main["choices"][0]["message"]["content"])
 print("Time taken :", time.time() - start_time)
