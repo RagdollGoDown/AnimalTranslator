@@ -5,13 +5,9 @@ Using https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503
 
 import requests
 from keys import HUGGING_FACE_KEY
+from keys import MISTRAL_API_KEY
 import time
 import base64
-
-
-
-
-
 import requests
 
 API_URL =  "https://router.huggingface.co/nebius/v1/chat/completions"
@@ -128,7 +124,7 @@ def image_and_text_to_text(image_path, questions):
 
 #input_text = "You are translating what the dog is saying : We have these informations :"
 #response_main = ask_mistral(input_text)
-
+'''
 input_text = "What is in this image ?"
 image_path = "assets/images/happy_dog.jpeg"
 response_main = image_and_text_to_text(image_path, input_text)
@@ -136,3 +132,27 @@ response_main = image_and_text_to_text(image_path, input_text)
 
 print(response_main["choices"][0]["message"]["content"])
 print("Time taken :", time.time() - start_time)
+'''
+
+
+
+
+import os
+from mistralai import Mistral
+
+api_key = MISTRAL_API_KEY
+model = "mistral-large-latest"
+
+client = Mistral(api_key=api_key)
+
+chat_response = client.chat.complete(
+    model = model,
+    messages = [
+        {
+            "role": "user",
+            "content": "What is the best French cheese?",
+        },
+    ]
+)
+
+print(chat_response.choices[0].message.content)
