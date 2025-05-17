@@ -87,7 +87,7 @@ def ask_mistral(question):
     return response
 
 
-def image_and_text_to_text(image_path, questions):
+'''def image_and_text_to_text(image_path, questions):
     with open(image_path, "rb") as f:
             base64_image = base64.b64encode(f.read()).decode("utf-8")
             image_url = f"data:image/jpeg;base64,{base64_image}"
@@ -115,7 +115,7 @@ def image_and_text_to_text(image_path, questions):
                 responses.append(response)
              
 
-    return responses
+    return responses'''
 
 
 
@@ -156,4 +156,31 @@ def ask_mistral(question):
             },
         ]
     )
+    return chat_response.choices[0].message.content
+
+def image_and_text_to_text(image_path, questions):
+    # Define the messages for the chat
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": questions
+                },
+                {
+                    "type": "image_url",
+                    "image_url": image_path
+                }
+            ]
+        }
+    ]
+
+    # Get the chat response
+    chat_response = client.chat.complete(
+        model=model,
+        messages=messages
+    )
+
+    # Print the content of the response
     return chat_response.choices[0].message.content
