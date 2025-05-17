@@ -6,22 +6,24 @@ Using https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503
 import requests
 from keys import HUGGING_FACE_KEY
 from keys import MISTRAL_API_KEY
-import time
+from keys import TOGETHER_AI
 import base64
 import requests
 
 import os
 from mistralai import Mistral
+from together import Together
 
 api_key = MISTRAL_API_KEY
-model1 = "mistral-large-latest"
-model2 = "pixtral-12b-2409" 
+model1 = "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"
+model2 = "meta-llama/Llama-Vision-Free" 
 
-client = Mistral(api_key=api_key)
+#client = Mistral(api_key=api_key)
+client = Together(api_key=TOGETHER_AI)
 
 
 def ask_mistral(question):
-    chat_response = client.chat.complete(
+    chat_response = client.chat.completions.create(
         model = model1,
         messages = [
             {
@@ -39,7 +41,7 @@ def image_and_text_to_text(image_path, questions):
     # Define the messages for the chat
     response = []
     for question in questions:
-
+        print("Question:", question)
         messages = [
             {
                 "role": "user",
@@ -50,14 +52,15 @@ def image_and_text_to_text(image_path, questions):
                     },
                     {
                         "type": "image_url",
-                        "image_url": image_url
+                        "image_url": {"url": image_url}
                     }
+                    
                 ]
             }
         ]
 
         # Get the chat response
-        chat_response = client.chat.complete(
+        chat_response = client.chat.completions.create(
             model=model2,
             messages=messages
         )

@@ -32,7 +32,6 @@ def pipeline_full(image_path, audio) -> str:
 
     image = Image.open(image_path)
 
-
     # image -> classify
     answers_image = query_image(image_path, questions=image_questions)
     #answers_image = query_blip(image,image_questions)
@@ -49,6 +48,8 @@ def pipeline_full(image_path, audio) -> str:
 
     # information aggregation
     final_text_question = f"""
+    You are an animal translator.
+
     The information retrieved from the image is:\n
     {image_info_block}
     The information retrieved from the sound is:\n
@@ -59,6 +60,8 @@ def pipeline_full(image_path, audio) -> str:
     The speech recognition should only serve as inspiration for your answer and not appear in it.
     Give a plausible answer with confidence.
     Keep it short and simple.
+
+    Now think of what an animal translator would say:
     \n
     """
     
@@ -77,7 +80,6 @@ def pipeline_audio(audio) -> str:
     {result}
 
     You are analyzing an animal in a sound. 
-    The information retrieved from the sound is a speech recognition result. 
     Do not mention it and only use it as inspiration for your answer.
     You do not have to actually tell the truth about the animal, just give a plausible answer with confidence.
     \n
@@ -92,8 +94,9 @@ def pipeline_image(image_path) -> str:
         "Give me a descritpition of the animal in the image, it's emotional state and what it's doing.",
     ]
 
-    # Load and process the image
+    # image -> classify
     answers_image = query_image(image_path, questions=image_questions)
+    #answers_image = query_blip(image,image_questions)
     
     image_info_block = ""
     for question, answer in zip(image_questions, answers_image):
@@ -106,8 +109,8 @@ def pipeline_image(image_path) -> str:
     {image_info_block}
     
     You are analyzing an animal in an image. 
-    Do not mention it and only use it as inspiration for your answer.
-    You do not have to actually tell the truth about the animal, just give a plausible answer with confidence.
+    Give a plausible answer with confidence.
+    Keep it short and simple.
     \n
     """
     
