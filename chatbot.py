@@ -29,6 +29,7 @@ from keys import HUGGING_FACE_KEY
 import requests
 import base64
 from mistral import image_and_text_to_text
+import pipeline
 
 # Enable logging
 logging.basicConfig(
@@ -46,7 +47,10 @@ headers = {
     "Authorization": f"Bearer {HUGGING_FACE_KEY}",
 }
 
-last_image_id = ""
+last_image_id = None
+last_audio_id = None
+last_command = None
+last_msg_type = None
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
@@ -63,6 +67,20 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
 
+async def yes_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    last_command = "yes"
+    
+
+async def no_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if last_msg_type == "photo":
+        image_pth = f"assets/images/{last_image_id}.wav"
+        await update.message.reply_text(pipeline.query_image(image_pth))
+    if last_msg_type == "audio":
+        audio_pth = f"assets/audio/{last_audio_id}.wav"
+        await update.message.reply_text(pipeline.pipeline_audio(audio_pth))
+    last_msg_type = None
+    
+
 
 def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
@@ -74,7 +92,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if msg.photo:
         photo: telegram.PhotoSize = msg.photo[-1]
-        if msg.caption:
+        '''if msg.caption:
             await msg.reply_text(f"Vous avez envoyé une photo avec la légende : « {msg.caption} »")
 
             file = await photo.get_file()  
@@ -87,26 +105,43 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             
             await msg.reply_text(response["choices"][0]["message"]["content"])
         else:
-            await msg.reply_text("Vous avez envoyé une photo sans légende.")
+            await msg.reply_text("Vous avez envoyé une photo sans légende.")'''
         
+
         last_image_id = photo.file_unique_id
+        last_msg_type = "photo"
         
-
-
-    elif msg.text:
-        await msg.reply_text(f"Vous avez envoyé un texte : « {msg.text} »")
 
     elif msg.audio or msg.voice:
-        audio = None
-        if msg.audio:
-            audio = msg.audio
-        else:
-            audio = msg.voice
-        
-        audio_file = await msg.get_file()
-        tmp_file = f"downloads/{audio.file_unique_id}.wav"
-        await audio_file.download_to_drive(tmp_file)
-        await msg.reply_text(f"Vous avez envoyé un audio ")
+        last_msg_type = "audio"
+
+    if msg.photo or msg.audio or msg.voice:
+        if last_command == None:
+            if msg.photo:
+                file = await photo.get_file()  
+
+                filename = f"assets/images/{photo.file_unique_id}.jpg"
+
+                await file.download_to_drive(custom_path=filename)
+                image_path = filename
+                msg.reply_text(f"Do you want to send an audio to analyze ?")
+            elif msg.audio or msg.voice:
+                audio = None
+                audio_file = await msg.get_file()
+                tmp_file = f"assets/audio/{audio.file_unique_id}.wav"
+                await audio_file.download_to_drive(tmp_file)
+                last_audio_id = audio.file_unique_id
+                msg.reply_text(f"Do you want to send a picture to analyze ?")
+        elif last_command == "yes":
+            photo: telegram.PhotoSize = msg.photo[-1]
+            # call full pipeline
+            image_path = f"assets/images/{last_image_id}.wav"
+            audio_path = f"assets/audio/{last_audio_id}.wav"
+            final_text = pipeline.pipeline_full(image_path, audio_path)
+            await msg.reply_text(final_text)
+            last_command = None
+            last_audio_id = None
+            last_image_id = None
 
     else:
         await msg.reply_text("Type de message non géré par echo.")
@@ -123,6 +158,8 @@ def main() -> None:
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("yes", yes_command))
+    application.add_handler(CommandHandler("no", no_command))
 
     # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(~filters.COMMAND, echo))
