@@ -25,9 +25,20 @@ pipe = pipeline(
     device=device,
 )
 
-# Load a sample audio file
-sample_path = os.getcwd() + "\\assets\\audio\\ylan_barking.wav"
-sample, sr = librosa.load(sample_path, sr=16000)
 
-result = pipe(sample)
-print(result["text"])
+def query_whisper(audio):
+    
+    result = pipe(audio)
+    return result["text"]
+    
+
+def main():
+    # Load a sample audio file
+    sample_path = os.getcwd() + "\\assets\\audio\\ylan_barking.wav"
+    sample, sr = librosa.load(sample_path, sr=16000)
+    
+    result = query_whisper(sample)
+    print(result)
+
+if __name__ == "__main__":
+    main()
