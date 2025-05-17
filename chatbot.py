@@ -137,6 +137,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 await msg.reply_text(f"Do you want to send an audio to analyze ?")
             elif msg.audio or msg.voice:
                 audio_file = None
+                audio = None
                 if msg.audio:
                     audio_file = await msg.audio.get_file()
                 else :
