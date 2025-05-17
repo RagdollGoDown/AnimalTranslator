@@ -47,9 +47,10 @@ headers = {
     "Authorization": f"Bearer {HUGGING_FACE_KEY}",
 }
 
+
 global last_image_id
 global last_audio_id
-global last_command
+last_command = None
 global last_msg_type
 
 # Define a few command handlers. These usually take the two arguments update and
@@ -89,7 +90,7 @@ def query(payload):
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     msg = update.message
-
+    global last_command
     if msg.photo:
         photo: telegram.PhotoSize = msg.photo[-1]
         '''if msg.caption:
