@@ -1,7 +1,6 @@
 attachment.pdf
 audio.*
 voice_note.*
-*.jpg
 apis_env/
 keys.py
 .DS_Store

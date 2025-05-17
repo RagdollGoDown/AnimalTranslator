@@ -18,14 +18,24 @@ def query_blip(image, question="How does this dog feel?"):
 
 def main():
     # Example usage
-    image_path = os.getcwd() + "\\assets\\images\\happy_dog.jpeg"
+    image_path = os.getcwd() + "\\assets\\images\\monkey.png"
     # Load the image
     image = Image.open(image_path)
 
-    question = "What does it inspire in you?"
+    question = "What is the animal in the image?"
 
     caption = query_blip(image, question)
-    print("Generated Caption:", caption)
+    print("Animal found:", caption)
+
+    question = "How is the animal feeling?"
+
+    caption = query_blip(image, question)
+    print("Animal feeling:", caption)
+
+    question = "What color is this animal?"
+
+    caption = query_blip(image, question)
+    print("Animal color:", caption)
 
 if __name__ == "__main__":
     main()
