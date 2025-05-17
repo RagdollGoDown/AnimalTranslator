@@ -32,6 +32,9 @@ def ask_mistral(question):
     return chat_response.choices[0].message.content
 
 def image_and_text_to_text(image_path, questions):
+    with open(image_path, "rb") as f:
+        base64_image = base64.b64encode(f.read()).decode("utf-8")
+    image_url = f"data:image/jpeg;base64,{base64_image}"
     # Define the messages for the chat
     response = []
     for question in questions:
@@ -46,7 +49,7 @@ def image_and_text_to_text(image_path, questions):
                     },
                     {
                         "type": "image_url",
-                        "image_url": image_path
+                        "image_url": image_url
                     }
                 ]
             }
