@@ -116,7 +116,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         last_msg_type = "audio"
 
     if msg.photo or msg.audio or msg.voice:
-        if last_command == None:
+        if last_command is None:
             if msg.photo:
                 file = await photo.get_file()  
 
