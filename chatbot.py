@@ -47,10 +47,10 @@ headers = {
     "Authorization": f"Bearer {HUGGING_FACE_KEY}",
 }
 
-last_image_id = None
-last_audio_id = None
-last_command = None
-last_msg_type = None
+global last_image_id
+global last_audio_id
+global last_command
+global last_msg_type
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
@@ -143,14 +143,15 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             last_audio_id = None
             last_image_id = None
 
-    else:
-        await msg.reply_text("Type de message non géré par echo.")
-
 
     #await update.message.reply_text(update.message.text)
 
 
 def main() -> None:
+    last_image_id = None
+    last_audio_id = None
+    last_command = None
+    last_msg_type = None
     """Start the bot."""
     # Create the Application and pass it your bot's token.
     application = Application.builder().token(TELEGRAM_KEY).build()
