@@ -80,9 +80,14 @@ def pipeline_audio(audio) -> str:
     The information retrieved from the sound is:\n
     {result}
 
-    You are analyzing an animal in a sound. 
-    Do not mention it and only use it as inspiration for your answer.
-    You do not have to actually tell the truth about the animal, just give a plausible answer with confidence.
+    Imagine yourself as a translator for animals.
+    You have information of the animals sound. Of course, you can't understand the animal,
+    but you are going to act like a confident translator and give a clear and plausible answer of what the animal is saying.
+
+    Keep in mind the information from the sound is just speech recognition, not the actual animal speech.
+    So it doesn't actually mean anything and you MUST NOT mention it. 
+
+    Give a short and simple answer, like a translator would:
     \n
     """
     
@@ -109,9 +114,11 @@ def pipeline_image(image_path) -> str:
     The information retrieved from the image is:\n
     {image_info_block}
     
-    You are analyzing an animal in an image. 
-    Give a plausible answer with confidence.
-    Keep it short and simple.
+    Imagine yourself as a translator for animals.
+    You have information from an image. Of course, you can't understand the animal,
+    but you are going to act like a confident translator and give a clear and plausible answer of what the animal is saying.
+
+    Give a short and simple answer, like a translator would do and cooborate it with the information from the image:
     \n
     """
     
