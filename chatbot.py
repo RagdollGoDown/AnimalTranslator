@@ -48,10 +48,10 @@ headers = {
 }
 
 
-global last_image_id
-global last_audio_id
+last_image_id = None
+last_audio_id = None
 last_command = None
-global last_msg_type
+last_msg_type = None
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
@@ -79,6 +79,11 @@ async def yes_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     
 
 async def no_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    global last_command
+    global last_image_id
+    global last_audio_id
+
+    global last_msg_type
     if last_msg_type == "photo":
         image_pth = f"assets/images/{last_image_id}.wav"
         await update.message.reply_text(pipeline.query_image(image_pth))
